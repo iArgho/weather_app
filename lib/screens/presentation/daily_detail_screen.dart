@@ -1,9 +1,10 @@
 import 'dart:ui';
-import 'package:Weatherly/screens/widgets/hourly_forecast_card.dart';
 import 'package:flutter/material.dart';
+import 'package:Weatherly/screens/widgets/hourly_forecast_card.dart';
 
 class DailyDetailScreen extends StatelessWidget {
   final Map<String, dynamic> data;
+
   const DailyDetailScreen({super.key, required this.data});
 
   @override
@@ -18,8 +19,11 @@ class DailyDetailScreen extends StatelessWidget {
           {'time': '14:00', 'icon': '⛈️', 'temperature': '20°C'},
         ];
 
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -32,76 +36,61 @@ class DailyDetailScreen extends StatelessWidget {
           ),
         ),
       ),
-      extendBodyBehindAppBar: true,
       body: SafeArea(
         child: SingleChildScrollView(
-          // Added to handle overflow
+          padding: const EdgeInsets.symmetric(vertical: 24.0),
           child: Center(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(30.0),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                  width: 300,
-                  padding: const EdgeInsets.all(24.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(30.0),
-                    border: Border.all(
-                      width: 2,
-                      color: Colors.white.withOpacity(0.3),
+            child: Column(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(30.0),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      width: screenWidth * 0.9,
+                      padding: const EdgeInsets.all(24.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(30.0),
+                        border: Border.all(
+                          width: 2,
+                          color: Colors.white.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            data["icon"] ?? "❓",
+                            style: const TextStyle(fontSize: 60),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            data["temp"] ?? "--°C",
+                            style: const TextStyle(
+                              fontSize: 48,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                        ],
+                      ),
                     ),
                   ),
+                ),
+
+                const SizedBox(height: 32),
+
+                // Hourly Forecast section
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        data["icon"] ?? "❓",
-                        style: const TextStyle(fontSize: 60),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        data["temp"] ?? "--°C",
-                        style: const TextStyle(
-                          fontSize: 48,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      // Optional: Add InfoChips for additional details
-                      if (data['humidity'] != null ||
-                          data['windSpeed'] != null ||
-                          data['pressure'] != null)
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            if (data['humidity'] != null)
-                              _InfoChip(
-                                icon: Icons.water_drop,
-                                label: 'Humidity',
-                                value: data['humidity'],
-                              ),
-                            if (data['windSpeed'] != null)
-                              _InfoChip(
-                                icon: Icons.air,
-                                label: 'Wind',
-                                value: data['windSpeed'],
-                              ),
-                            if (data['pressure'] != null)
-                              _InfoChip(
-                                icon: Icons.speed,
-                                label: 'Pressure',
-                                value: data['pressure'],
-                              ),
-                          ],
-                        ),
-                      const SizedBox(height: 20),
-                      // Hourly Forecast Section
                       const Text(
                         'Hourly Forecast',
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -110,24 +99,28 @@ class DailyDetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       SizedBox(
-                        height: 120, // Adjust height as needed
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: hourlyData.length,
-                          itemBuilder: (context, index) {
-                            final hour = hourlyData[index];
-                            return HourlyForecastCard(
-                              time: hour['time']!,
-                              icon: hour['icon']!,
-                              temperature: hour['temperature']!,
-                            );
-                          },
+                        height: 120,
+                        child: Center(
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: hourlyData.length,
+                            separatorBuilder:
+                                (_, __) => const SizedBox(width: 12),
+                            itemBuilder: (context, index) {
+                              final hour = hourlyData[index];
+                              return HourlyForecastCard(
+                                time: hour['time']!,
+                                icon: hour['icon']!,
+                                temperature: hour['temperature']!,
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
+              ],
             ),
           ),
         ),
@@ -154,7 +147,7 @@ class _InfoChip extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.2),
             borderRadius: BorderRadius.circular(20),
@@ -164,14 +157,15 @@ class _InfoChip extends StatelessWidget {
             ),
           ),
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(icon, color: Colors.white, size: 20),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               Text(
                 "$label: $value",
                 style: const TextStyle(
                   color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],

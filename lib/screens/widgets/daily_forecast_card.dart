@@ -4,7 +4,7 @@ import 'package:Weatherly/screens/presentation/daily_detail_screen.dart';
 import 'package:flutter/material.dart';
 
 class DailyForecastCard extends StatelessWidget {
-  final Map<String, String> data; // pass the whole map
+  final Map<String, String> data;
 
   const DailyForecastCard({super.key, required this.data});
 
